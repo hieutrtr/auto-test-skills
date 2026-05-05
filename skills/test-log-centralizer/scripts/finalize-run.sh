@@ -227,4 +227,16 @@ mv -f "$run_json_tmp" "$run_dir/run.json"
 runs_root="$(dirname "$run_dir")"
 ( cd "$runs_root" && ln -sfn "$run_id" latest )
 
+# --- optional retention sweep (T-1.6) -------------------------------------
+# Opt-in via TEST_LOG_RETAIN=1 to keep test isolation: T-1.1..T-1.5 unit
+# tests must NOT trigger retention while exercising finalize, otherwise
+# their assertions about run-dir count + file shape would race against the
+# sweep. Production callers (auto-test orchestrator) export the flag.
+if [[ "${TEST_LOG_RETAIN:-0}" == "1" ]]; then
+  retain_script="$(dirname "$0")/retain.sh"
+  if [[ -x "$retain_script" ]]; then
+    "$retain_script" "$runs_root" >/dev/null 2>&1 || true
+  fi
+fi
+
 echo "$run_dir"

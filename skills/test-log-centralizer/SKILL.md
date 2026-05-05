@@ -59,6 +59,14 @@ bun test 2>&1 | "$SKILL_DIR/scripts/append-log.sh" "$RUN" unit
 # re-point <project>/.test-runs/latest. Counts are caller-supplied (T-1.4 parsers
 # fill them later); pass 0/0/0/0 for a placeholder.
 "$SKILL_DIR/scripts/finalize-run.sh" "$RUN" "$EXIT_CODE" "$TOTAL" "$PASSED" "$FAILED" "$SKIPPED"
+
+# 4. (Optional) Trigger retention sweep at end-of-run by exporting TEST_LOG_RETAIN=1
+# before finalize. Default OFF so test suites for T-1.1..T-1.5 stay isolated; the
+# auto-test orchestrator opts in. Equivalent to invoking retain.sh directly:
+"$SKILL_DIR/scripts/retain.sh" "<project-root>/.test-runs"
+# Policy: keep newest 10 plain, gzip the next 2 (run.log → run.log.gz, drop
+# streams/ + screenshots/, keep run.json + manifest.json + summary.json + meta.json),
+# delete anything older. Idempotent on re-run.
 ```
 
 The `<runner>` and `<command>` arguments to `init-run.sh` are optional — when
@@ -83,14 +91,15 @@ scripts/
   init-run.sh           — T-1.1: scaffold run folder + meta.json + summary.json placeholder
   append-log.sh         — T-1.2: per-layer stream append with ISO-8601 UTC ts prefix
   finalize-run.sh       — T-1.2: merge streams → run.log, write summary/manifest/run.json,
-                          re-point .test-runs/latest atomically
-  retention.sh          — T-1.6 (pending; gz oldest, prune > 10)
+                          re-point .test-runs/latest atomically; optional retain hook (T-1.6)
+  retain.sh             — T-1.6: count-based retention sweep (10 plain + 2 gz + prune)
 references/
   schema.md             — T-1.2: contract for meta.json, summary.json, manifest.json, run.json
 tests/
   test-init-run.sh      — T-1.1 acceptance (35 assertions)
   test-append-log.sh    — T-1.2 acceptance (36 assertions)
   test-finalize-run.sh  — T-1.2 acceptance (55 assertions, incl. golden compare)
+  test-retention.sh     — T-1.6 acceptance (71 assertions, incl. 12-/14-/5-run scenarios + idempotency + finalize wiring)
   goldens/
     manifest.golden.json — normalized golden for finalize-run shape stability
   run-all.sh            — convenience runner; bash run-all.sh exits 0 when everything green
