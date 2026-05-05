@@ -1,0 +1,12 @@
+{
+  "name": "fixture-jest",
+  "version": "0.0.0",
+  "private": true,
+  "description": "T-1.3 fixture: minimal Jest project. Has jest.config.js + jest in devDependencies + a test script that invokes jest directly. No lockfile other than a stub package-lock.json so the detector should resolve runtime=node, package_manager=npm.",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

@@ -1,0 +1,7 @@
+# T-1.3 fixture lockfile stub — detector only checks file presence to derive
+# package_manager=pnpm. Contents intentionally minimal; this is not a real
+# pnpm-resolved lockfile.
+lockfileVersion: '6.0'
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false

@@ -1,0 +1,12 @@
+{
+  "name": "fixture-mocha",
+  "version": "0.0.0",
+  "private": true,
+  "description": "T-1.3 fixture: minimal Mocha project. Has .mocharc.json + mocha in devDependencies + a test script invoking mocha. Lockfile is yarn.lock so the detector should resolve runtime=node, package_manager=yarn.",
+  "scripts": {
+    "test": "mocha"
+  },
+  "devDependencies": {
+    "mocha": "^10.4.0"
+  }
+}

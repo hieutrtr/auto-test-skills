@@ -1,0 +1,12 @@
+{
+  "name": "fixture-vitest",
+  "version": "0.0.0",
+  "private": true,
+  "description": "T-1.3 fixture: minimal Vitest project. Has vitest.config.ts + vitest in devDependencies + a test script using vitest run. Lockfile is pnpm-lock.yaml so the detector should resolve runtime=node, package_manager=pnpm.",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^1.6.0"
+  }
+}
