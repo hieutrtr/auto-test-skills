@@ -6,14 +6,18 @@ allowed-tools: Bash, Read, Glob, Grep
 
 # unit-test-runner
 
-JS/TS unit-test framework detector + canonical-output parser. Phase 1
+JS/TS unit-test framework detector + canonical-output parser + the
+detect→init→exec→parse→finalize orchestrator helper. Phase 1
 **T-1.3** ships `scripts/detect.sh` (5-fixture heuristic). Phase 1
 **T-1.4** ships the parser layer: `scripts/parse-jest.sh`,
 `scripts/parse-vitest.sh`, `scripts/parse-bun.sh`, and the
 `scripts/parse.sh` dispatcher — they take a runner's stdout and emit the
 canonical `run.json` shape consumed by `auto-test` (T-1.5) and the
-claude-bridge loop. A future `scripts/run.sh` (T-1.5 orchestrator wiring)
-will chain detect → invoke → parse end-to-end.
+claude-bridge loop. Phase 1 **T-1.5** adds `scripts/run.sh` — chains
+detect → init-run → exec runner → append-log → parse → finalize-run end
+to end, returns the run-dir on stdout, and translates the framework's
+exit code through to the {0, 1, 2} contract documented in
+`auto-test/references/exit-codes.md`.
 
 ## When to use
 
@@ -106,24 +110,38 @@ Per-framework reporter input shape:
 > Jest 22, and aligns with ARCHITECTURE §2's "JSON reporter where
 > available" preference. Documented in `references/parser-output-schema.md`.
 
-### Run + parse (Phase 1.5 — pending T-1.5 orchestrator)
+### Run end-to-end (Phase 1.5 — `scripts/run.sh`)
 
-The end-to-end flow once `auto-test/scripts/orchestrate.sh` lands:
+`scripts/run.sh` chains the entire pipeline. Usage:
 
 ```bash
-# 1. init-run via the log centralizer (T-1.1 done)
-RUN=$("$LOG_CENTRALIZER/scripts/init-run.sh" "$PROJECT_ROOT" "$framework" "$command")
+# Single arg: the project root. Stdout: one line — absolute path to the
+# finalized run dir under <project>/.test-runs/<UTC-ts>/.
+"$SKILL_DIR/scripts/run.sh" "$PROJECT_ROOT"
 
-# 2. spawn runner with stdout/stderr piped through the centralizer
-eval "$command" 2>&1 | "$LOG_CENTRALIZER/scripts/append-log.sh" "$RUN" unit
-EXIT=${PIPESTATUS[0]}
-
-# 3. parse stream → canonical run.json (T-1.4)
-"$SKILL_DIR/scripts/parse.sh" "$framework" "$RUN/streams/unit.log" > "$RUN/run.json"
-
-# 4. finalize (counts come from parsed summary)
-"$LOG_CENTRALIZER/scripts/finalize-run.sh" "$RUN" "$EXIT" $TOTAL $PASSED $FAILED $SKIPPED
+# Optional override when test-log-centralizer lives elsewhere:
+"$SKILL_DIR/scripts/run.sh" "$PROJECT_ROOT" --centralizer-dir "$ALT_PATH"
 ```
+
+What it does internally (single self-contained pipeline):
+
+1. `detect.sh` — pick framework + command (exits 2 on `unknown`).
+2. `test-log-centralizer/init-run.sh` — scaffold run dir + `meta.json` +
+   `summary.json` placeholder.
+3. spawn the framework command from the project root, with
+   `NO_COLOR=1 FORCE_COLOR=0 CI=1` so output is deterministic; merge
+   stdout/stderr and pipe through `append-log.sh <RUN> unit`. Preserve
+   the framework's exit code through `${PIPESTATUS[0]}`.
+4. strip the timestamp prefix `append-log.sh` adds, then `parse.sh
+   <framework>` over the cleaned stream → canonical run.json content.
+5. `finalize-run.sh` writes summary/manifest + a placeholder run.json;
+   `run.sh` then merges its parsed output (summary/failures/suites) into
+   that placeholder so the final `run.json` is the rich shape, not the
+   skeleton.
+6. exit translation: framework 0 → 0, 1 → 1, ≥ 2 (or parse failure) → 2.
+
+The `auto-test` meta-skill (`skills/auto-test/scripts/orchestrate.sh`)
+wraps this — it adds the ASCII dashboard render on top.
 
 ## Examples
 
@@ -149,7 +167,7 @@ scripts/
   parse-jest.sh                — T-1.4: jest --json → canonical run.json
   parse-vitest.sh              — T-1.4: vitest --reporter=json → canonical run.json
   parse-bun.sh                 — T-1.4: bun text → canonical run.json
-  run.sh                       — T-1.5 (pending): detect + invoke + parse wrapper
+  run.sh                       — T-1.5: detect → init-run → exec → append → parse → finalize
 references/
   framework-detection.md       — T-1.3: priority order, marker table, edge cases
   parser-output-schema.md      — T-1.4: canonical TestRun/run.json shape, status mapping, deviation rationale

@@ -1,0 +1,30 @@
+{
+  "schema_version": "1",
+  "run_id": "20260506T050000Z",
+  "project": "/abs/path/to/sample-app",
+  "started_at": "2026-05-06T05:00:00Z",
+  "finished_at": "2026-05-06T05:00:01Z",
+  "duration_ms": 1234,
+  "framework": "vitest",
+  "command": "pnpm test",
+  "exit_code": 1,
+  "summary": {
+    "total": 5,
+    "passed": 3,
+    "failed": 2,
+    "skipped": 0
+  },
+  "failed_cases": [],
+  "log_path": "/abs/path/to/sample-app/.test-runs/20260506T050000Z/run.log",
+  "artifacts": {
+    "log": "run.log",
+    "summary": "summary.json",
+    "json": "run.json",
+    "browser_console": null,
+    "screenshots": [],
+    "flaky_report": null,
+    "coverage_summary": null,
+    "manual_checklist": null
+  },
+  "layers": ["unit"]
+}
