@@ -1,0 +1,78 @@
+{
+  "failures": [
+    {
+      "file": "/abs/path/to/auth.test.js",
+      "message": "Error: expected 401 got 500",
+      "name": "Login flow rejects bad password"
+    }
+  ],
+  "framework": "jest",
+  "schema_version": "1",
+  "suites": [
+    {
+      "cases": [
+        {
+          "duration_ms": 12,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "Login flow accepts good password",
+          "status": "passed"
+        },
+        {
+          "duration_ms": 18,
+          "error_msg": "Error: expected 401 got 500",
+          "error_stack": "Error: expected 401 got 500\n    at Object.<anonymous> (/abs/path/to/auth.test.js:14:7)\n    at TestScheduler._run (...)",
+          "name": "Login flow rejects bad password",
+          "status": "failed"
+        },
+        {
+          "duration_ms": 0,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "Login flow OAuth fallback",
+          "status": "skipped"
+        }
+      ],
+      "duration_ms": 320,
+      "file": "/abs/path/to/auth.test.js",
+      "name": "auth.test.js",
+      "status": "failed"
+    },
+    {
+      "cases": [
+        {
+          "duration_ms": 5,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "formatDate formats ISO dates",
+          "status": "passed"
+        },
+        {
+          "duration_ms": 3,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "formatDate handles null",
+          "status": "passed"
+        },
+        {
+          "duration_ms": 0,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "formatDate timezone offset",
+          "status": "skipped"
+        }
+      ],
+      "duration_ms": 180,
+      "file": "/abs/path/to/utils.test.js",
+      "name": "utils.test.js",
+      "status": "passed"
+    }
+  ],
+  "summary": {
+    "duration_ms": 680,
+    "failed": 1,
+    "passed": 3,
+    "skipped": 2,
+    "total": 6
+  }
+}

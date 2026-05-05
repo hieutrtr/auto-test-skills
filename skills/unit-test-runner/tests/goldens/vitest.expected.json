@@ -1,0 +1,71 @@
+{
+  "failures": [
+    {
+      "file": "/abs/path/to/api.test.ts",
+      "message": "AssertionError: expected 'users' to deeply equal 'people'",
+      "name": "api > GET /users > returns paginated body"
+    }
+  ],
+  "framework": "vitest",
+  "schema_version": "1",
+  "suites": [
+    {
+      "cases": [
+        {
+          "duration_ms": 14,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "api > GET /users > returns 200",
+          "status": "passed"
+        },
+        {
+          "duration_ms": 22,
+          "error_msg": "AssertionError: expected 'users' to deeply equal 'people'",
+          "error_stack": "AssertionError: expected 'users' to deeply equal 'people'\n    at /abs/path/to/api.test.ts:21:18",
+          "name": "api > GET /users > returns paginated body",
+          "status": "failed"
+        }
+      ],
+      "duration_ms": 250,
+      "file": "/abs/path/to/api.test.ts",
+      "name": "api.test.ts",
+      "status": "failed"
+    },
+    {
+      "cases": [
+        {
+          "duration_ms": 1,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "parse > handles empty string",
+          "status": "passed"
+        },
+        {
+          "duration_ms": 2,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "parse > handles whitespace",
+          "status": "passed"
+        },
+        {
+          "duration_ms": 0,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "parse > handles unicode (todo)",
+          "status": "skipped"
+        }
+      ],
+      "duration_ms": 120,
+      "file": "/abs/path/to/parse.test.ts",
+      "name": "parse.test.ts",
+      "status": "passed"
+    }
+  ],
+  "summary": {
+    "duration_ms": 520,
+    "failed": 1,
+    "passed": 3,
+    "skipped": 1,
+    "total": 5
+  }
+}

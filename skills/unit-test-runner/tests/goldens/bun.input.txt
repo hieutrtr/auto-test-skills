@@ -1,0 +1,29 @@
+bun test v1.3.11 (af24e281)
+
+tests/utils.test.ts:
+(pass) formatDate > formats ISO dates [0.42ms]
+(pass) formatDate > handles null [0.18ms]
+(skip) formatDate > timezone offset
+
+tests/auth.test.ts:
+3 | describe("login", () => {
+4 |   test("accepts good password", () => {
+5 |     expect(login("good")).toBe(true);
+6 |   });
+7 |   test("rejects bad password", () => {
+8 |     expect(login("bad")).toBe(true);
+                            ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/abs/path/to/auth.test.ts:8:30)
+(fail) login > rejects bad password [1.20ms]
+(pass) login > accepts good password [0.95ms]
+
+ 3 pass
+ 1 skip
+ 1 fail
+ 7 expect() calls
+Ran 5 tests across 2 files. [12.00ms]

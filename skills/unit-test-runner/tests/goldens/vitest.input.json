@@ -1,0 +1,72 @@
+{
+  "numTotalTestSuites": 2,
+  "numPassedTestSuites": 1,
+  "numFailedTestSuites": 1,
+  "numTotalTests": 5,
+  "numPassedTests": 3,
+  "numFailedTests": 1,
+  "numPendingTests": 1,
+  "numTodoTests": 0,
+  "startTime": 1730000010000,
+  "success": false,
+  "testResults": [
+    {
+      "name": "/abs/path/to/api.test.ts",
+      "startTime": 1730000010100,
+      "endTime": 1730000010350,
+      "status": "failed",
+      "assertionResults": [
+        {
+          "ancestorTitles": ["api", "GET /users"],
+          "title": "returns 200",
+          "fullName": "api > GET /users > returns 200",
+          "status": "passed",
+          "duration": 14,
+          "failureMessages": []
+        },
+        {
+          "ancestorTitles": ["api", "GET /users"],
+          "title": "returns paginated body",
+          "fullName": "api > GET /users > returns paginated body",
+          "status": "failed",
+          "duration": 22,
+          "failureMessages": [
+            "AssertionError: expected 'users' to deeply equal 'people'\n    at /abs/path/to/api.test.ts:21:18"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "/abs/path/to/parse.test.ts",
+      "startTime": 1730000010400,
+      "endTime": 1730000010520,
+      "status": "passed",
+      "assertionResults": [
+        {
+          "ancestorTitles": ["parse"],
+          "title": "handles empty string",
+          "fullName": "parse > handles empty string",
+          "status": "passed",
+          "duration": 1,
+          "failureMessages": []
+        },
+        {
+          "ancestorTitles": ["parse"],
+          "title": "handles whitespace",
+          "fullName": "parse > handles whitespace",
+          "status": "passed",
+          "duration": 2,
+          "failureMessages": []
+        },
+        {
+          "ancestorTitles": ["parse"],
+          "title": "handles unicode (todo)",
+          "fullName": "parse > handles unicode (todo)",
+          "status": "pending",
+          "duration": null,
+          "failureMessages": []
+        }
+      ]
+    }
+  ]
+}

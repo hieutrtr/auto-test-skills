@@ -6,12 +6,14 @@ allowed-tools: Bash, Read, Glob, Grep
 
 # unit-test-runner
 
-JS/TS unit-test framework detector + (Phase 1.4) canonical-output parser. This
-SKILL.md covers Phase 1 task **T-1.3** scope: the `scripts/detect.sh`
-heuristic + 5-fixture test suite. The Phase 1.4 follow-up adds
-`scripts/parse-jest.sh`, `scripts/parse-vitest.sh`, `scripts/parse-bun.sh`,
-and `scripts/run.sh` (detect → invoke → parse → emit canonical TestRun JSON
-into the log centralizer's `run.json`).
+JS/TS unit-test framework detector + canonical-output parser. Phase 1
+**T-1.3** ships `scripts/detect.sh` (5-fixture heuristic). Phase 1
+**T-1.4** ships the parser layer: `scripts/parse-jest.sh`,
+`scripts/parse-vitest.sh`, `scripts/parse-bun.sh`, and the
+`scripts/parse.sh` dispatcher — they take a runner's stdout and emit the
+canonical `run.json` shape consumed by `auto-test` (T-1.5) and the
+claude-bridge loop. A future `scripts/run.sh` (T-1.5 orchestrator wiring)
+will chain detect → invoke → parse end-to-end.
 
 ## When to use
 
@@ -76,9 +78,37 @@ Priority (when multiple markers are present, e.g. monorepo migration):
 **vitest > jest > playwright-runner > mocha > bun**. Documented in
 `references/framework-detection.md` and asserted by the test suite.
 
-### Run + parse (Phase 1.4 — placeholder)
+### Parse (Phase 1.4 — landed)
 
-The end-to-end flow once T-1.4 lands:
+The parser layer accepts the runner's structured / text stdout and emits
+the canonical `run.json` shape (5 top-level keys: `schema_version`,
+`framework`, `summary`, `failures`, `suites`). See
+`references/parser-output-schema.md` for the full contract.
+
+```bash
+# Parse a captured stdout file (works with absolute or relative paths).
+parsed_json="$("$SKILL_DIR/scripts/parse.sh" "$framework" "$RUN/streams/unit.log")"
+
+# Or stream stdin → parser:
+"$command" 2>&1 | "$SKILL_DIR/scripts/parse-${framework}.sh" -
+```
+
+Per-framework reporter input shape:
+
+| `framework` | Input format          | How to capture                                |
+|-------------|-----------------------|-----------------------------------------------|
+| `jest`      | Jest's `--json`       | `jest --json`                                  |
+| `vitest`    | Vitest `--reporter=json` | `vitest run --reporter=json`                |
+| `bun`       | Default text          | `bun test` (verbose adds per-pass lines)       |
+
+> Why Jest `--json` instead of "TAP" (as the plan listed): Jest ships no
+> built-in TAP reporter; `--json` is built-in, documented, stable since
+> Jest 22, and aligns with ARCHITECTURE §2's "JSON reporter where
+> available" preference. Documented in `references/parser-output-schema.md`.
+
+### Run + parse (Phase 1.5 — pending T-1.5 orchestrator)
+
+The end-to-end flow once `auto-test/scripts/orchestrate.sh` lands:
 
 ```bash
 # 1. init-run via the log centralizer (T-1.1 done)
@@ -88,10 +118,10 @@ RUN=$("$LOG_CENTRALIZER/scripts/init-run.sh" "$PROJECT_ROOT" "$framework" "$comm
 eval "$command" 2>&1 | "$LOG_CENTRALIZER/scripts/append-log.sh" "$RUN" unit
 EXIT=${PIPESTATUS[0]}
 
-# 3. parse stream → canonical TestRun (Phase 1.4 task)
-"$SKILL_DIR/scripts/parse-${framework}.sh" "$RUN/streams/unit.log" > "$RUN/run.json"
+# 3. parse stream → canonical run.json (T-1.4)
+"$SKILL_DIR/scripts/parse.sh" "$framework" "$RUN/streams/unit.log" > "$RUN/run.json"
 
-# 4. finalize
+# 4. finalize (counts come from parsed summary)
 "$LOG_CENTRALIZER/scripts/finalize-run.sh" "$RUN" "$EXIT" $TOTAL $PASSED $FAILED $SKIPPED
 ```
 
@@ -115,18 +145,18 @@ User: "tail .test-runs/latest/run.log" → does **not** activate — plain
 ```
 scripts/
   detect.sh                    — T-1.3: framework + runtime + PM heuristic; emits JSON
-  parse-jest.sh                — T-1.4 (pending): jest TAP/JSON → run.json
-  parse-vitest.sh              — T-1.4 (pending): vitest --reporter=json → run.json
-  parse-bun.sh                 — T-1.4 (pending): bun text → run.json
-  run.sh                       — T-1.4 (pending): detect + invoke + parse wrapper
+  parse.sh                     — T-1.4: dispatcher (jest|vitest|bun → parse-<fw>.sh)
+  parse-jest.sh                — T-1.4: jest --json → canonical run.json
+  parse-vitest.sh              — T-1.4: vitest --reporter=json → canonical run.json
+  parse-bun.sh                 — T-1.4: bun text → canonical run.json
+  run.sh                       — T-1.5 (pending): detect + invoke + parse wrapper
 references/
   framework-detection.md       — T-1.3: priority order, marker table, edge cases
-  parser-output-schema.md      — T-1.4 (pending): canonical TestRun shape (ARCHITECTURE §f)
+  parser-output-schema.md      — T-1.4: canonical TestRun/run.json shape, status mapping, deviation rationale
 tests/
-  test-detect.sh               — T-1.3: 6-fixture acceptance suite (~40 assertions)
-  test-parse-jest.sh           — T-1.4 (pending)
-  test-parse-vitest.sh         — T-1.4 (pending)
-  test-parse-bun.sh            — T-1.4 (pending)
+  run-all.sh                   — T-1.4: convenience runner (alphabetical test-*.sh)
+  test-detect.sh               — T-1.3: 6-fixture acceptance suite (~70 assertions)
+  test-parsers.sh              — T-1.4: 79-assertion acceptance + branch coverage
   fixtures/
     jest/                      — package.json + jest.config.js + package-lock.json
     vitest/                    — package.json + vitest.config.ts + pnpm-lock.yaml
@@ -134,7 +164,7 @@ tests/
     mocha/                     — package.json + .mocharc.json + yarn.lock
     playwright-runner/         — package.json + playwright.config.ts + package-lock.json
     unknown/                   — empty (no package.json)
-  goldens/                     — T-1.4 (pending): per-framework run.json snapshots
+  goldens/                     — T-1.4: per-framework {input, expected.json} pairs
 ```
 
 ## See also

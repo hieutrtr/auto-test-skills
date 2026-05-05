@@ -1,0 +1,80 @@
+{
+  "numFailedTestSuites": 1,
+  "numPassedTestSuites": 1,
+  "numTotalTestSuites": 2,
+  "numFailedTests": 1,
+  "numPassedTests": 3,
+  "numPendingTests": 1,
+  "numTodoTests": 1,
+  "numTotalTests": 6,
+  "startTime": 1730000000000,
+  "success": false,
+  "testResults": [
+    {
+      "name": "/abs/path/to/auth.test.js",
+      "startTime": 1730000000100,
+      "endTime": 1730000000420,
+      "status": "failed",
+      "assertionResults": [
+        {
+          "ancestorTitles": ["Login flow"],
+          "title": "accepts good password",
+          "fullName": "Login flow accepts good password",
+          "status": "passed",
+          "duration": 12,
+          "failureMessages": []
+        },
+        {
+          "ancestorTitles": ["Login flow"],
+          "title": "rejects bad password",
+          "fullName": "Login flow rejects bad password",
+          "status": "failed",
+          "duration": 18,
+          "failureMessages": [
+            "Error: expected 401 got 500\n    at Object.<anonymous> (/abs/path/to/auth.test.js:14:7)\n    at TestScheduler._run (...)"
+          ]
+        },
+        {
+          "ancestorTitles": ["Login flow"],
+          "title": "OAuth fallback",
+          "fullName": "Login flow OAuth fallback",
+          "status": "todo",
+          "duration": null,
+          "failureMessages": []
+        }
+      ]
+    },
+    {
+      "name": "/abs/path/to/utils.test.js",
+      "startTime": 1730000000500,
+      "endTime": 1730000000680,
+      "status": "passed",
+      "assertionResults": [
+        {
+          "ancestorTitles": ["formatDate"],
+          "title": "formats ISO dates",
+          "fullName": "formatDate formats ISO dates",
+          "status": "passed",
+          "duration": 5,
+          "failureMessages": []
+        },
+        {
+          "ancestorTitles": ["formatDate"],
+          "title": "handles null",
+          "fullName": "formatDate handles null",
+          "status": "passed",
+          "duration": 3,
+          "failureMessages": []
+        },
+        {
+          "ancestorTitles": ["formatDate"],
+          "title": "timezone offset",
+          "fullName": "formatDate timezone offset",
+          "status": "pending",
+          "duration": null,
+          "failureMessages": []
+        }
+      ]
+    }
+  ]
+}

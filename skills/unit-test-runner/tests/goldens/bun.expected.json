@@ -1,0 +1,71 @@
+{
+  "failures": [
+    {
+      "file": "tests/auth.test.ts",
+      "message": "error: expect(received).toBe(expected)",
+      "name": "login > rejects bad password"
+    }
+  ],
+  "framework": "bun",
+  "schema_version": "1",
+  "suites": [
+    {
+      "cases": [
+        {
+          "duration_ms": 0,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "formatDate > formats ISO dates",
+          "status": "passed"
+        },
+        {
+          "duration_ms": 0,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "formatDate > handles null",
+          "status": "passed"
+        },
+        {
+          "duration_ms": 0,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "formatDate > timezone offset",
+          "status": "skipped"
+        }
+      ],
+      "duration_ms": 0,
+      "file": "tests/utils.test.ts",
+      "name": "utils.test.ts",
+      "status": "passed"
+    },
+    {
+      "cases": [
+        {
+          "duration_ms": 1,
+          "error_msg": "error: expect(received).toBe(expected)",
+          "error_stack": "3 | describe(\"login\", () => {\n4 |   test(\"accepts good password\", () => {\n5 |     expect(login(\"good\")).toBe(true);\n6 |   });\n7 |   test(\"rejects bad password\", () => {\n8 |     expect(login(\"bad\")).toBe(true);\n                            ^\nerror: expect(received).toBe(expected)\n\nExpected: true\nReceived: false\n\n      at <anonymous> (/abs/path/to/auth.test.ts:8:30)",
+          "name": "login > rejects bad password",
+          "status": "failed"
+        },
+        {
+          "duration_ms": 1,
+          "error_msg": "",
+          "error_stack": "",
+          "name": "login > accepts good password",
+          "status": "passed"
+        }
+      ],
+      "duration_ms": 2,
+      "file": "tests/auth.test.ts",
+      "name": "auth.test.ts",
+      "status": "failed"
+    }
+  ],
+  "summary": {
+    "duration_ms": 12,
+    "failed": 1,
+    "passed": 3,
+    "skipped": 1,
+    "total": 5
+  }
+}
