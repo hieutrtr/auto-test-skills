@@ -1,0 +1,30 @@
+{
+  "schema_version": "1",
+  "run_id": "<redacted>",
+  "project": "<redacted>",
+  "started_at": "<redacted>",
+  "finished_at": "<redacted>",
+  "duration_ms": "<redacted>",
+  "framework": "bun:test",
+  "command": "<redacted>",
+  "exit_code": 0,
+  "summary": {
+    "total": 3,
+    "passed": 3,
+    "failed": 0,
+    "skipped": 0
+  },
+  "failed_cases": [],
+  "log_path": "<redacted>",
+  "artifacts": {
+    "log": "run.log",
+    "summary": "summary.json",
+    "json": "run.json",
+    "browser_console": null,
+    "screenshots": [],
+    "flaky_report": null,
+    "coverage_summary": null,
+    "manual_checklist": null
+  },
+  "layers": ["browser", "integration", "unit"]
+}

@@ -20,10 +20,11 @@ Activate **only** when invoked as a sub-step of another testing skill — typica
 
 - A caller skill needs to **start** a fresh run → run `scripts/init-run.sh`.
 - A caller skill needs to **append** stdout/stderr to a per-layer stream → run
-  `scripts/append-log.sh`.
+  `scripts/append-log.sh`. Each emitted line is prefixed with an ISO-8601 UTC
+  timestamp (ms-precision when `python3` is available, second-precision otherwise).
 - A caller skill needs to **finalize** the run (merge streams → `run.log`,
-  emit `manifest.json` + `run.json`, re-point `latest`) → run
-  `scripts/finalize-run.sh`. *(T-1.2 — not yet present in iter T-1.1.)*
+  emit `summary.json` (final form) + `manifest.json` + `run.json`, re-point
+  `latest`) → run `scripts/finalize-run.sh`.
 
 Do **not** activate when the user message is about reading or tailing existing
 logs — that is a plain `Read` / `Grep` of `<project>/.test-runs/latest/run.log`
@@ -32,23 +33,39 @@ and does not need this skill.
 Do **not** activate for non-test logging (general application logs, build output,
 lint output, deployment output). Those belong elsewhere.
 
-## How to use (T-1.1 surface only)
+## How to use
 
 ```bash
-# Start a new run — echoes the absolute run-folder path on stdout.
+SKILL_DIR="$(dirname "$0")/.."   # caller adjusts to its own layout
+
+# 1. Start a new run — echoes the absolute run-folder path on stdout.
 RUN=$("$SKILL_DIR/scripts/init-run.sh" "<project-root>" "<runner>" "<command>")
 # RUN now points to <project-root>/.test-runs/<UTC-ts>/.
-# The folder contains:
-#   run.log          (empty file, append target)
+# Initial folder contents (T-1.1):
+#   run.log          (empty file; finalize-run.sh fills via stream merge)
 #   meta.json        (run_id, start_ts, project_dir, runner, command, schema_version)
-#   summary.json     (placeholder; finalize-run.sh fills counts + status)
-#   streams/         (per-layer log files; written by append-log.sh — T-1.2)
-#   screenshots/     (browser-test artifacts — T-2.x)
+#   summary.json     (placeholder; finalize-run.sh promotes to final form)
+#   streams/         (per-layer log files; written by append-log.sh)
+#   screenshots/     (browser-test artifacts — Phase 2)
+
+# 2. Append per-layer log lines.
+# Inline form:
+"$SKILL_DIR/scripts/append-log.sh" "$RUN" unit "starting suite tests/auth"
+# Stdin form (stream a runner's stdout/stderr line-buffered):
+bun test 2>&1 | "$SKILL_DIR/scripts/append-log.sh" "$RUN" unit
+# Each appended line is also tee-ed to streams/all.log for live tail.
+
+# 3. Finalize — merge streams into run.log, write final summary/manifest/run.json,
+# re-point <project>/.test-runs/latest. Counts are caller-supplied (T-1.4 parsers
+# fill them later); pass 0/0/0/0 for a placeholder.
+"$SKILL_DIR/scripts/finalize-run.sh" "$RUN" "$EXIT_CODE" "$TOTAL" "$PASSED" "$FAILED" "$SKIPPED"
 ```
 
-The `<runner>` and `<command>` arguments are optional — when omitted, `meta.runner`
-defaults to `"tbd"` and `meta.command` to the empty string. They are filled later by
-the caller skill once framework detection has run.
+The `<runner>` and `<command>` arguments to `init-run.sh` are optional — when
+omitted, `meta.runner` defaults to `"tbd"` and `meta.command` to the empty
+string. They are filled later by the caller skill once framework detection
+has run. See `references/schema.md` for the full JSON shape contract that
+downstream skills + agents can rely on.
 
 ## Examples
 
@@ -63,14 +80,20 @@ it calls `Read` on `<project>/.test-runs/latest/run.log` directly.
 
 ```
 scripts/
-  init-run.sh        — T-1.1; this iter
-  append-log.sh      — T-1.2 (pending)
-  finalize-run.sh    — T-1.2 (pending)
-  retention.sh       — T-1.6 (pending)
+  init-run.sh           — T-1.1: scaffold run folder + meta.json + summary.json placeholder
+  append-log.sh         — T-1.2: per-layer stream append with ISO-8601 UTC ts prefix
+  finalize-run.sh       — T-1.2: merge streams → run.log, write summary/manifest/run.json,
+                          re-point .test-runs/latest atomically
+  retention.sh          — T-1.6 (pending; gz oldest, prune > 10)
 references/
-  schema.md          — T-1.2 (pending; manifest.json + run.json schemas)
+  schema.md             — T-1.2: contract for meta.json, summary.json, manifest.json, run.json
 tests/
-  test-init-run.sh   — T-1.1; this iter (plain-bash TAP harness)
+  test-init-run.sh      — T-1.1 acceptance (35 assertions)
+  test-append-log.sh    — T-1.2 acceptance (36 assertions)
+  test-finalize-run.sh  — T-1.2 acceptance (55 assertions, incl. golden compare)
+  goldens/
+    manifest.golden.json — normalized golden for finalize-run shape stability
+  run-all.sh            — convenience runner; bash run-all.sh exits 0 when everything green
 ```
 
 ## See also
