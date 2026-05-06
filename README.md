@@ -15,17 +15,14 @@ Mục tiêu cụ thể:
 
 ## Install
 
-Drop vào skill directory của Claude Code:
-
 ```bash
-# Cá nhân (per-user)
-git clone https://github.com/<owner>/auto-test-skills ~/.claude/skills/auto-test-skills
-
-# Hoặc cài qua plugin (khi đã publish)
-claude plugin install auto-test-skills
+git clone https://github.com/<owner>/auto-test-skills /tmp/auto-test-skills
+mkdir -p ~/.claude/skills
+cp -R /tmp/auto-test-skills/skills/* ~/.claude/skills/
+# restart Claude Code, then ask: "run the unit tests"
 ```
 
-Sau khi cài, restart Claude Code. Các skill `auto-test`, `unit-test-runner`, `browser-test`, … sẽ tự xuất hiện trong skill list và Claude tự trigger khi description match yêu cầu của user.
+Verify the drop with `bash /tmp/auto-test-skills/tools/lint-all.sh`. After restart, the skills `auto-test`, `unit-test-runner`, and `test-log-centralizer` are listed and Claude auto-triggers `auto-test` when the user asks to run tests. See [`skills/README.md`](skills/README.md) for the full skill manifest.
 
 ## Supported runtimes
 
