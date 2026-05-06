@@ -1,0 +1,485 @@
+## auto-test smoke — scenario=regression
+==> test-append-log.sh
+# T-1.2 append-log.sh tests
+  ok   init-run.sh + append-log.sh present + executable
+  ok   file exists: streams/unit.log
+  ok   inline append → 1 line == 1
+  ok   line 1 has ts prefix matches /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?Z/
+  ok   line 1 ends in 'hello' matches /[[:space:]]hello$/
+  ok   stdin form → 3 lines == 3
+  ok   stdin order line 1 == a
+  ok   stdin order line 2 == b
+  ok   stdin order line 3 == c
+  ok   stdin: every line has ts prefix == 0
+  ok   file exists: streams/all.log
+  ok   all.log mirrors prior 3 stdin lines == 3
+  ok   all.log grows by 1 after a browser append == 4
+  ok   file exists: streams/unit.log
+  ok   file exists: streams/integration.log
+  ok   file exists: streams/browser.log
+  ok   file exists: streams/orchestrator.log
+  ok   file exists: streams/skill.log
+  ok   file exists: streams/setup.log
+  ok   file exists: streams/teardown.log
+  ok   bogus layer rejected
+  ok   no file: streams/bogus.log not created
+  ok   missing-arg exit code == 2 == 2
+  ok   usage diagnostic on stderr matches /usage:/
+  ok   bad run-dir exit ≠ 0 (got 1)
+  ok   bad run-dir diagnostic matches /append-log/
+  ok   unit.log line count == 2
+  ok   browser.log line count == 2
+  ok   integration.log line count == 1
+  ok   unit.log: zero foreign tags == 0
+  ok   browser.log: zero foreign tags == 0
+  ok   integration.log: zero foreign tags == 0
+  ok   all.log: 5 tee'd lines == 5
+  ok   TS non-decreasing across 1s gap (TS1=2026-05-06T00:09:25.518Z, TS2=2026-05-06T00:09:26.748Z)
+  ok   TS1 is RFC3339-UTC matches /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?Z/
+  ok   TS2 is RFC3339-UTC matches /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?Z/
+
+# summary: 36 passed, 0 failed
+    [pass] test-append-log.sh
+
+==> test-finalize-run.sh
+# T-1.2 finalize-run.sh tests
+  ok   init-run.sh + append-log.sh + finalize-run.sh present + executable
+  ok   file exists: run.log
+  ok   file exists: summary.json
+  ok   file exists: manifest.json
+  ok   file exists: run.json
+  ok   run.log line count == 3
+  ok   summary.status == passed
+  ok   summary.exit_code == 0
+  ok   summary.total == 3
+  ok   summary.passed == 3
+  ok   summary.failed == 0
+  ok   summary.skipped == 0
+  ok   summary.duration_ms positive == True
+  ok   merge order [0] == ULINE
+  ok   merge order [1] == ILINE
+  ok   merge order [2] == BLINE
+  ok   merge order [3] == OLINE
+  ok   merge order [4] == SLINE
+  ok   merge order [5] == SETLINE
+  ok   merge order [6] == TLINE
+  ok   summary.json has keys [schema_version,status,exit_code,duration_ms,total,passed,failed,skipped,finished_ts,log_path]
+  ok   summary.log_path absolute == True
+  ok   summary.finished_ts shape == True
+  ok   F4 summary.status == failed
+  ok   F4 summary.exit_code == 1
+  ok   F4 summary.failed == 1
+  ok   F5 summary.status (failed-count override) == failed
+  ok   F6 summary.status (exit 2 → error) == error
+  ok   valid JSON: manifest.json
+  ok   manifest.json has keys [schema_version,run_id,project,started_at,finished_at,duration_ms,framework,command,exit_code,summary,failed_cases,log_path,artifacts,layers]
+  ok   manifest.failed_cases is [] == True
+  ok   manifest.framework == meta.runner == bun:test
+  ok   manifest.command   == meta.command == bun test
+  ok   manifest.layers is list == True
+  ok   manifest.layers contains unit/integration/browser == True
+  ok   manifest.summary.total == 3 == 3
+  ok   valid JSON: run.json
+  ok   run.json.schema_version == 1
+  ok   run.json.run_id == 20260506T000926Z
+  ok   run.json.suites is [] == True
+  ok   latest is a symlink
+  ok   latest target == most recent run_id == 20260506T000930Z-1
+  ok   latest resolves to a dir
+  ok   F1 duration_ms ≤ 60000 == True
+  ok   manifest.duration_ms == summary.duration_ms == True
+  ok   no stray entries in .test-runs/ == 0
+  ok   no *.tmp leftovers in run dir == 0
+  ok   missing run-dir exit ≠ 0 (got 1)
+  ok   missing run-dir diagnostic matches /finalize/
+  ok   missing meta.json exit ≠ 0 (got 1)
+  ok   missing meta.json diagnostic matches /meta.json/
+  ok   no *.tmp after successful finalize == 0
+  ok   golden file present
+  ok   manifest matches golden (normalized)
+  ok   no *.tmp anywhere under .test-runs/ == 0
+
+# summary: 55 passed, 0 failed
+    [pass] test-finalize-run.sh
+
+==> test-init-run.sh
+# T-1.1 init-run.sh tests
+  ok   init-run.sh present + executable
+  ok   dir exists: run dir
+  ok   dir exists: streams/
+  ok   dir exists: screenshots/
+  ok   file exists: run.log
+  ok   file exists: meta.json
+  ok   file exists: summary.json
+  ok   run_id format matches /^[0-9]{8}T[0-9]{6}Z(-[0-9]+)?$/
+  ok   valid JSON: meta.json
+  ok   meta.json has keys [schema_version,run_id,start_ts,started_epoch_ms,project_dir,runner,command]
+  ok   meta.run_id == 20260506T000932Z
+  ok   meta.project_dir == /private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/tmp.zte89EL6Hi
+  ok   meta.runner == bun:test
+  ok   meta.command == bun test
+  ok   meta.schema_version == 1
+  ok   meta.start_ts shape == True
+  ok   meta.started_epoch_ms positive int == True
+  ok   valid JSON: summary.json
+  ok   summary.schema_version == 1
+  ok   summary.status == in_progress
+  ok   summary.total == 0
+  ok   summary.passed == 0
+  ok   summary.failed == 0
+  ok   summary.skipped == 0
+  ok   summary.exit_code == None
+  ok   file empty: run.log
+  ok   pre-existing marker preserved
+  ok   dir exists: second run dir
+  ok   collision counter avoided clobber: 20260506T000932Z-2
+  ok   collision suffix shape matches /^[0-9]{8}T[0-9]{6}Z-[0-9]+$/
+  ok   bad project root rejected
+  ok   missing args rejected
+  ok   meta.runner default == tbd
+  ok   meta.command default == 
+  ok   4 invocations → 4 distinct run dirs == 4
+
+# summary: 35 passed, 0 failed
+    [pass] test-init-run.sh
+
+==> test-retention.sh
+
+ok   retain.sh present + executable
+ok   T1.6-R2: seeded 12 fake runs
+ok   T1.6-R2.latest seed == 20260101T010012Z
+ok   T1.6-R3: retain.sh exit == 0
+ok   T1.6-R4: 12-run total preserved == 12
+ok   T1.6-R5: 20260101T010003Z classified == plain
+ok   T1.6-R5: 20260101T010004Z classified == plain
+ok   T1.6-R5: 20260101T010005Z classified == plain
+ok   T1.6-R5: 20260101T010006Z classified == plain
+ok   T1.6-R5: 20260101T010007Z classified == plain
+ok   T1.6-R5: 20260101T010008Z classified == plain
+ok   T1.6-R5: 20260101T010009Z classified == plain
+ok   T1.6-R5: 20260101T010010Z classified == plain
+ok   T1.6-R5: 20260101T010011Z classified == plain
+ok   T1.6-R5: 20260101T010012Z classified == plain
+ok   T1.6-R6: 20260101T010001Z classified == gz
+ok   file exists: 20260101T010001Z/run.log.gz
+ok   no file: 20260101T010001Z/run.log
+ok   no dir: 20260101T010001Z/streams
+ok   no dir: 20260101T010001Z/screenshots
+ok   file exists: 20260101T010001Z/run.json
+ok   file exists: 20260101T010001Z/manifest.json
+ok   file exists: 20260101T010001Z/summary.json
+ok   file exists: 20260101T010001Z/meta.json
+ok   T1.6-R6: 20260101T010002Z classified == gz
+ok   file exists: 20260101T010002Z/run.log.gz
+ok   no file: 20260101T010002Z/run.log
+ok   no dir: 20260101T010002Z/streams
+ok   no dir: 20260101T010002Z/screenshots
+ok   file exists: 20260101T010002Z/run.json
+ok   file exists: 20260101T010002Z/manifest.json
+ok   file exists: 20260101T010002Z/summary.json
+ok   file exists: 20260101T010002Z/meta.json
+ok   T1.6-R8: gunzip round-trip == merged log payload 20260101T010001Z
+ok   T1.6-R9: idempotent retain.sh exit == 0
+ok   T1.6-R10: 20260101T010001Z gz signature stable across re-runs == 20260101T010001Z:19684723:62
+ok   T1.6-R10: 20260101T010002Z gz signature stable across re-runs == 20260101T010002Z:19684724:62
+ok   T1.6-R11: latest symlink unchanged == 20260101T010012Z
+ok   T1.6-R12.exit retain on 14-run set == 0
+ok   no dir: T1.6-R12.del:20260101T010001Z
+ok   no dir: T1.6-R12.del:20260101T010002Z
+ok   T1.6-R12.gz 20260101T010003Z classified == gz
+ok   T1.6-R12.gz 20260101T010004Z classified == gz
+ok   T1.6-R12.plain 20260101T010005Z classified == plain
+ok   T1.6-R12.plain 20260101T010006Z classified == plain
+ok   T1.6-R12.plain 20260101T010007Z classified == plain
+ok   T1.6-R12.plain 20260101T010008Z classified == plain
+ok   T1.6-R12.plain 20260101T010009Z classified == plain
+ok   T1.6-R12.plain 20260101T010010Z classified == plain
+ok   T1.6-R12.plain 20260101T010011Z classified == plain
+ok   T1.6-R12.plain 20260101T010012Z classified == plain
+ok   T1.6-R12.plain 20260101T010013Z classified == plain
+ok   T1.6-R12.plain 20260101T010014Z classified == plain
+ok   T1.6-R12.total dirs after prune == 12
+ok   T1.6-R13.plain 20260101T010001Z == plain
+ok   T1.6-R13.plain 20260101T010002Z == plain
+ok   T1.6-R13.plain 20260101T010003Z == plain
+ok   T1.6-R13.plain 20260101T010004Z == plain
+ok   T1.6-R13.plain 20260101T010005Z == plain
+ok   T1.6-R13.count == 5
+ok   T1.6-R14.empty exit == 0
+ok   T1.6-R14.empty count == 0
+ok   T1.6-R15.missing root exit == 0
+ok   T1.6-R16.no flag → no compaction == 0
+ok   T1.6-R17.flag → compaction triggered (gz_count=2)
+ok   file exists: T1.6-R18.config.json untouched
+ok   dir exists: T1.6-R18.notes/ untouched
+ok   file exists: T1.6-R18.notes/scratch.txt untouched
+ok   T1.6-R18.latest preserved == 20260101T010011Z
+ok   T1.6-R18.plain count == 10 == 10
+ok   T1.6-R18.gz    count ==  1 == 1
+
+# test-retention.sh: PASS=71 FAIL=0
+    [pass] test-retention.sh
+
+# run-all: ALL test scripts passed
+  [ok] /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/test-log-centralizer/tests/run-all.sh
+==> test-detect.sh
+# T-1.3 detect.sh tests
+  ok   detect.sh present + executable
+  ok   valid JSON: fixture/jest output
+  ok   valid JSON: fixture/vitest output
+  ok   valid JSON: fixture/bun output
+  ok   valid JSON: fixture/mocha output
+  ok   valid JSON: fixture/playwright-runner output
+  ok   valid JSON: fixture/unknown output
+  ok   jest.framework == jest
+  ok   jest.runtime == node
+  ok   jest.package_manager == npm
+  ok   jest.command == npm test
+  ok   jest.test_script == jest
+  ok   jest.markers contains 'jest.config.js'
+  ok   jest.markers contains 'devDep:jest'
+  ok   jest.markers contains 'script:test'
+  ok   vitest.framework == vitest
+  ok   vitest.runtime == node
+  ok   vitest.package_manager == pnpm
+  ok   vitest.command == pnpm test
+  ok   vitest.test_script == vitest run
+  ok   vitest.markers contains 'vitest.config.ts'
+  ok   vitest.markers contains 'devDep:vitest'
+  ok   bun.framework == bun
+  ok   bun.runtime == bun
+  ok   bun.package_manager == bun
+  ok   bun.command == bun test
+  ok   bun.test_script == bun test
+  ok   bun.markers contains 'bun.lockb'
+  ok   bun.markers contains 'script:test:contains:bun test'
+  ok   mocha.framework == mocha
+  ok   mocha.runtime == node
+  ok   mocha.package_manager == yarn
+  ok   mocha.command == yarn test
+  ok   mocha.test_script == mocha
+  ok   mocha.markers contains '.mocharc.json'
+  ok   mocha.markers contains 'devDep:mocha'
+  ok   pw.framework == playwright-runner
+  ok   pw.runtime == node
+  ok   pw.package_manager == npm
+  ok   pw.command == npm test
+  ok   pw.test_script == playwright test
+  ok   pw.markers contains 'playwright.config.ts'
+  ok   pw.markers contains 'devDep:@playwright/test'
+  ok   unknown.framework == unknown
+  ok   unknown.runtime == unknown
+  ok   unknown.package_manager == unknown
+  ok   unknown.command == 
+  ok   unknown.test_script == 
+  ok   fixture/jest keys has keys [schema_version,framework,runtime,package_manager,command,project_dir,test_script,markers]
+  ok   fixture/vitest keys has keys [schema_version,framework,runtime,package_manager,command,project_dir,test_script,markers]
+  ok   fixture/bun keys has keys [schema_version,framework,runtime,package_manager,command,project_dir,test_script,markers]
+  ok   fixture/mocha keys has keys [schema_version,framework,runtime,package_manager,command,project_dir,test_script,markers]
+  ok   fixture/playwright-runner keys has keys [schema_version,framework,runtime,package_manager,command,project_dir,test_script,markers]
+  ok   fixture/unknown keys has keys [schema_version,framework,runtime,package_manager,command,project_dir,test_script,markers]
+  ok   fixture/jest project_dir == /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/unit-test-runner/tests/fixtures/jest
+  ok   fixture/vitest project_dir == /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/unit-test-runner/tests/fixtures/vitest
+  ok   fixture/bun project_dir == /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/unit-test-runner/tests/fixtures/bun
+  ok   fixture/mocha project_dir == /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/unit-test-runner/tests/fixtures/mocha
+  ok   fixture/playwright-runner project_dir == /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/unit-test-runner/tests/fixtures/playwright-runner
+  ok   fixture/unknown project_dir == /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/unit-test-runner/tests/fixtures/unknown
+  ok   fixture/jest schema_version == 1
+  ok   fixture/vitest schema_version == 1
+  ok   fixture/bun schema_version == 1
+  ok   fixture/mocha schema_version == 1
+  ok   fixture/playwright-runner schema_version == 1
+  ok   fixture/unknown schema_version == 1
+  ok   missing arg exit code == 2
+  ok   missing arg stderr matches /usage/
+  ok   bad-dir arg exit code == 2
+  ok   symlink resolves to canonical == /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/unit-test-runner/tests/fixtures/jest
+  ok   tie-break: vitest beats jest == vitest
+  ok   validate-skill.sh PASS for unit-test-runner
+# summary: 72 passed, 0 failed
+    [pass] test-detect.sh
+
+==> test-parsers.sh
+
+--- Test Summary ---
+ok   executable: parse-jest.sh
+ok   executable: parse-vitest.sh
+ok   executable: parse-bun.sh
+ok   executable: parse.sh
+ok   file exists: jest.input.json
+ok   file exists: vitest.input.json
+ok   file exists: bun.input.txt
+ok   file exists: jest.expected.json
+ok   file exists: vitest.expected.json
+ok   file exists: bun.expected.json
+ok   file exists: parser-output-schema.md
+ok   T1.4-1 jest output byte-equals golden
+ok   T1.4-2 vitest output byte-equals golden
+ok   T1.4-3 bun output byte-equals golden
+ok   T1.4-4 dispatch jest byte-equals golden
+ok   T1.4-4 dispatch vitest byte-equals golden
+ok   T1.4-4 dispatch bun byte-equals golden
+ok   T1.4-5 dispatch unknown exit code == 2
+ok   T1.4-5 dispatch unknown stderr matches /unknown framework/
+ok   T1.4-6 jest summary integrity == OK
+ok   T1.4-6 vitest summary integrity == OK
+ok   T1.4-6 bun summary integrity == OK
+ok   T1.4-7 jest failures count == suite-level fail count == OK
+ok   T1.4-7 vitest failures count == suite-level fail count == OK
+ok   T1.4-7 bun failures count == suite-level fail count == OK
+ok   T1.4-8 jest failures fields populated == OK
+ok   T1.4-8 vitest failures fields populated == OK
+ok   T1.4-8 bun failures fields populated == OK
+ok   T1.4-9..11 jest has 'passed' case (n=3)
+ok   T1.4-9..11 jest has 'failed' case (n=1)
+ok   T1.4-9..11 jest has 'skipped' case (n=2)
+ok   T1.4-9..11 vitest has 'passed' case (n=3)
+ok   T1.4-9..11 vitest has 'failed' case (n=1)
+ok   T1.4-9..11 vitest has 'skipped' case (n=1)
+ok   T1.4-9..11 bun has 'passed' case (n=3)
+ok   T1.4-9..11 bun has 'failed' case (n=1)
+ok   T1.4-9..11 bun has 'skipped' case (n=1)
+ok   T1.4-12 jest todo+pending mapped to skipped (n=2)
+ok   T1.4-13 vitest pending → skipped (n=1)
+ok   T1.4-14 parse-jest.sh empty input exit code == 2
+ok   T1.4-14 parse-jest.sh empty input stderr matches /empty/
+ok   T1.4-14 parse-vitest.sh empty input exit code == 2
+ok   T1.4-14 parse-vitest.sh empty input stderr matches /empty/
+ok   T1.4-14 parse-bun.sh empty input exit code == 2
+ok   T1.4-14 parse-bun.sh empty input stderr matches /empty/
+ok   T1.4-15 parse-jest.sh missing file exit code == 2
+ok   T1.4-15 parse-jest.sh missing file stderr matches /not a file/
+ok   T1.4-15 parse-vitest.sh missing file exit code == 2
+ok   T1.4-15 parse-vitest.sh missing file stderr matches /not a file/
+ok   T1.4-15 parse-bun.sh missing file exit code == 2
+ok   T1.4-15 parse-bun.sh missing file stderr matches /not a file/
+ok   T1.4-16 parse-jest.sh malformed JSON exit code == 2
+ok   T1.4-16 parse-jest.sh malformed JSON stderr matches /(invalid JSON|JSON)/
+ok   T1.4-16 parse-vitest.sh malformed JSON exit code == 2
+ok   T1.4-16 parse-vitest.sh malformed JSON stderr matches /(invalid JSON|JSON)/
+ok   T1.4-16 parse-bun no markers exit code == 2
+ok   T1.4-16 parse-bun no markers stderr matches /test markers/
+ok   T1.4-17 jest duration_ms int≥0 == OK
+ok   T1.4-17 vitest duration_ms int≥0 == OK
+ok   T1.4-17 bun duration_ms int≥0 == OK
+ok   T1.4-18 jest suite[0] preserves input order == /abs/path/to/auth.test.js
+ok   T1.4-18 vitest suite[0] preserves input order == /abs/path/to/api.test.ts
+ok   T1.4-18 bun suite[0] preserves input order == tests/utils.test.ts
+ok   T1.4-19 jest top-level keys exact == OK
+ok   T1.4-19 vitest top-level keys exact == OK
+ok   T1.4-19 bun top-level keys exact == OK
+ok   T1.4-20 bun fail error captured == OK
+ok   T1.4-21 validate-skill exit code == 0
+ok   T1.4-21 validate-skill 8/8 matches /8 / 8|8/8|PASS/
+ok   T1.4-22 parser-output-schema.md ≥ 30 lines (n=180)
+ok   T1.4-22 mentions schema_version
+ok   T1.4-22 documents TAP→JSON deviation
+ok   T1.4-23 jest stdin == file byte-equals golden
+ok   T1.4-23 bun stdin == file byte-equals golden
+ok   T1.4-24 jest timeout-status → skipped == skipped
+ok   T1.4-24 vitest timeout-status → skipped == skipped
+ok   T1.4-25 jest all-skip suite status == skipped
+ok   T1.4-25 vitest all-skip suite status == skipped
+ok   T1.4-25 bun all-skip suite status == skipped
+
+79 passed / 0 failed (total 79)
+    [pass] test-parsers.sh
+
+# run-all: ALL test scripts passed
+  [ok] /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/unit-test-runner/tests/run-all.sh
+=== running test-orchestrate.sh ===
+  ✔ empty-project orchestrate exits 2 (was rc=2)
+  ✔ missing sibling skill → exit 2 (was rc=2)
+  ✔ missing sibling stderr says 'sibling skill not found'
+  ✔ bun fixture orchestrate exits 0 (was rc=0)
+  ✔ stdout has dashboard top corner
+  ✔ stdout has UNIT row
+  ✔ stdout shows passed=1
+  ✔ stdout shows failed=0
+  ✔ trailing LATEST= present
+  ✔ trailing LOG= present
+  ✔ trailing JSON= present
+  ✔ trailing EXIT=0 present
+  ✔ LATEST path is a directory
+  ✔ summary.json exists in run dir
+  ✔ manifest.json exists in run dir
+  ✔ run.json exists in run dir
+  ✔ run.log exists in run dir
+  ✔ summary invariant passed+failed+skipped == total
+  ✔ summary.json#passed == run.json#summary.passed
+  ✔ .test-runs/latest symlink points to run dir basename
+
+[orchestrate] PASS=20  FAIL=0
+=== test-orchestrate.sh OK ===
+
+=== running test-render-dashboard.sh ===
+[render-dashboard] driving against /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/auto-test/tests/goldens/sample-run
+  ✔ header line contains 'auto-test'
+  ✔ header contains run_id 20260506T050000Z
+  ✔ header shows duration 1234ms
+  ✔ Project row present with basename 'sample-app'
+  ✔ Framework row shows vitest
+  ✔ Command row shows 'pnpm test'
+  ✔ UNIT row present
+  ✔ UNIT row shows 3 passed
+  ✔ UNIT row shows 2 failed
+  ✔ UNIT row shows 0 skipped
+  ✔ FAILURES section present
+  ✔ shows auth failure name
+  ✔ shows auth failure message
+  ✔ shows checkout failure name
+  ✔ no '(… more — see run.log)' for 2 failures
+  ✔ ARTIFACTS section present
+  ✔ log line present
+  ✔ json line present
+  ✔ manifest line present
+  ✔ EXIT footer shows '2 of 5 tests failed'
+  ✔ trailing LATEST= absolute path present
+  ✔ trailing LOG= ends with run.log
+  ✔ trailing JSON= ends with run.json
+  ✔ trailing EXIT=1 (runner-exit override applied)
+  ✔ top corner '┌' present
+  ✔ bottom corner '└' present
+  ✔ green path: header shows '✔ ALL'
+  ✔ green path: NO FAILURES section
+  ✔ green path: footer 'all 5 tests passed'
+  ✔ green path: trailing EXIT=0
+  ✔ error path: header shows '‼ ERROR'
+  ✔ error path: footer 'EXIT 2'
+  ✔ error path: trailing EXIT=2
+  ✔ rejects missing run-dir with non-zero exit
+
+[render-dashboard] PASS=34  FAIL=0
+=== test-render-dashboard.sh OK ===
+
+run-all: all green
+  [ok] /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/auto-test/tests/run-all.sh
+==> test-validate-skill.sh
+
+ok   [T1.7-Vtest-log-centralizer] validate-skill.sh PASS on production skill: test-log-centralizer
+ok   [T1.7-Vunit-test-runner] validate-skill.sh PASS on production skill: unit-test-runner
+ok   [T1.7-Vauto-test] validate-skill.sh PASS on production skill: auto-test
+ok   [T1.7-N-no-frontmatter] validator FAIL on defect fixture: no-frontmatter (rc=1)
+ok   [T1.7-N-missing-name] validator FAIL on defect fixture: missing-name (rc=1)
+ok   [T1.7-N-missing-desc] validator FAIL on defect fixture: missing-desc (rc=1)
+ok   [T1.7-N-name-mismatch] validator FAIL on defect fixture: name-mismatch (rc=1)
+ok   [T1.7-N-desc-too-short] validator FAIL on defect fixture: desc-too-short (rc=1)
+ok   [T1.7-N-no-body] validator FAIL on defect fixture: no-body (rc=1)
+ok   [T1.7-N-arg] validator exits 2 on missing arg
+ok   [T1.7-N-path] validator exits 1 on missing folder
+ok   [T1.7-LA1] lint-all.sh PASS over skills/*
+ok   [T1.7-LA2] lint-all.sh exits 1 on negative-fixture root
+ok   [T1.7-LA3] lint-all.sh exits 2 on empty root
+ok   [T1.7-DEF-no-frontmatter] fixture present
+ok   [T1.7-DEF-missing-name] fixture present
+ok   [T1.7-DEF-missing-desc] fixture present
+ok   [T1.7-DEF-name-mismatch] fixture present
+ok   [T1.7-DEF-desc-too-short] fixture present
+ok   [T1.7-DEF-no-body] fixture present
+
+# tests: 20 pass / 0 fail (of 20)
+    [pass] test-validate-skill.sh
+
+# run-all: ALL tools test scripts passed
+  [ok] /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/tools/tests/run-all.sh
+RESULT: PASS

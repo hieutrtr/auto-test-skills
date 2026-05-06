@@ -1,0 +1,36 @@
+## auto-test smoke — scenario=bun-pass
+## host=Darwin/arm64  bash=3.2.57(1)-release
+## bun=1.3.11
+## work=/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-pass.XXXXXX.FSJGLhGlcR
+## scenario=pass
+----- orchestrate.sh stdout (rc=0) -----
+┌──────────────────────────────────────────────────────────────────┐
+│  auto-test  ·  run 20260506T000921Z  ·  duration 480ms   ✔ ALL   │
+├──────────────────────────────────────────────────────────────────┤
+│  Project   : proj                                                │
+│  Framework : bun (auto-detected)                                 │
+│  Command   : bun test                                            │
+├──────────────────────────────────────────────────────────────────┤
+│  UNIT          ✔ 1 passed   ✘ 0 failed    ⚠ 0 skipped            │
+├──────────────────────────────────────────────────────────────────┤
+│  ARTIFACTS                                                       │
+│    log       /private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r000…│
+│    json      /private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r000…│
+│    manifest  /private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r000…│
+├──────────────────────────────────────────────────────────────────┤
+│  EXIT 0   all 1 tests passed                                     │
+└──────────────────────────────────────────────────────────────────┘
+
+LATEST=/private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-pass.XXXXXX.FSJGLhGlcR/proj/.test-runs/20260506T000921Z
+LOG=/private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-pass.XXXXXX.FSJGLhGlcR/proj/.test-runs/20260506T000921Z/run.log
+JSON=/private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-pass.XXXXXX.FSJGLhGlcR/proj/.test-runs/20260506T000921Z/run.json
+EXIT=0
+----- end stdout -----
+# elapsed_ms=1145
+----- parsed trailer -----
+LATEST=/private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-pass.XXXXXX.FSJGLhGlcR/proj/.test-runs/20260506T000921Z
+LOG=/private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-pass.XXXXXX.FSJGLhGlcR/proj/.test-runs/20260506T000921Z/run.log
+JSON=/private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-pass.XXXXXX.FSJGLhGlcR/proj/.test-runs/20260506T000921Z/run.json
+EXIT=0
+----- summary: total=1 failed=0 -----
+RESULT: PASS  (elapsed_ms=1145)

@@ -1,0 +1,40 @@
+## auto-test smoke — scenario=bun-fail
+## host=Darwin/arm64  bash=3.2.57(1)-release
+## bun=1.3.11
+## work=/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-fail.XXXXXX.TSN5ZqD7TA
+## scenario=fail
+----- orchestrate.sh stdout (rc=1) -----
+┌──────────────────────────────────────────────────────────────────┐
+│  auto-test  ·  run 20260506T000922Z  ·  duration 799ms   ✘ FAIL  │
+├──────────────────────────────────────────────────────────────────┤
+│  Project   : proj                                                │
+│  Framework : bun (auto-detected)                                 │
+│  Command   : bun test                                            │
+├──────────────────────────────────────────────────────────────────┤
+│  UNIT          ✔ 1 passed   ✘ 1 failed    ⚠ 0 skipped            │
+├──────────────────────────────────────────────────────────────────┤
+│  FAILURES                                                        │
+│   • fail.test.ts › intentional failure for smoke                 │
+│       error: expect(received).toBe(expected)                     │
+├──────────────────────────────────────────────────────────────────┤
+│  ARTIFACTS                                                       │
+│    log       /private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r000…│
+│    json      /private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r000…│
+│    manifest  /private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r000…│
+├──────────────────────────────────────────────────────────────────┤
+│  EXIT 1   1 of 2 tests failed                                    │
+└──────────────────────────────────────────────────────────────────┘
+
+LATEST=/private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-fail.XXXXXX.TSN5ZqD7TA/proj/.test-runs/20260506T000922Z
+LOG=/private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-fail.XXXXXX.TSN5ZqD7TA/proj/.test-runs/20260506T000922Z/run.log
+JSON=/private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-fail.XXXXXX.TSN5ZqD7TA/proj/.test-runs/20260506T000922Z/run.json
+EXIT=1
+----- end stdout -----
+# elapsed_ms=1526
+----- parsed trailer -----
+LATEST=/private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-fail.XXXXXX.TSN5ZqD7TA/proj/.test-runs/20260506T000922Z
+LOG=/private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-fail.XXXXXX.TSN5ZqD7TA/proj/.test-runs/20260506T000922Z/run.log
+JSON=/private/var/folders/2s/q28w7wkj0hn5bn8671ykw73r0000gn/T/autotest_smoke_bun-fail.XXXXXX.TSN5ZqD7TA/proj/.test-runs/20260506T000922Z/run.json
+EXIT=1
+----- summary: total=2 failed=1 -----
+RESULT: PASS  (elapsed_ms=1526)

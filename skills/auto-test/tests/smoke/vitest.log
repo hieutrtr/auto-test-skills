@@ -1,0 +1,12 @@
+## auto-test smoke — scenario=vitest
+## host=Darwin/arm64  bash=3.2.57(1)-release
+[skip:node not found in PATH]
+## manual fallback (run on a host with node + the right pkg manager):
+##   cd $(mktemp -d)
+##   cp -R /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/unit-test-runner/tests/fixtures/vitest vitest-smoke && cd vitest-smoke
+##   pnpm install     # or: npm i
+##   bash /Users/hieutran/projects/bridge-bot-ts-1/auto-test-skills/skills/auto-test/scripts/orchestrate.sh .
+##   echo "exit=$?"
+##   ls .test-runs/
+##   python3 -m json.tool .test-runs/*/run.json | head -40
+## expected: exit=0, dashboard ends with 'EXIT 0   all <N> tests passed'
